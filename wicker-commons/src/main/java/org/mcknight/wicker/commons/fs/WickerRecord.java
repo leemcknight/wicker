@@ -8,6 +8,10 @@ public class WickerRecord {
 	public WickerRecord() {
 		
 	}
+
+	public void add(String fieldName, Object data) {
+
+	}
 		
 	public String getString(String fieldName) {
 		return map.get(fieldName).toString();
