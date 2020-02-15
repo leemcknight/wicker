@@ -7,12 +7,12 @@ public class FilterExpression extends Expression {
     private Object filterValue;
 
     public FilterExpression isEqualTo(Object o) {
-
+        return null;
     }
 
     @Override
     public WickerRecord evaluate(WickerRecord record) {
-        
+        return null;
     }
 
 }

@@ -13,10 +13,9 @@ public abstract class WickerFile {
 	private Schema schema;
 
 	
-	public static WickerFile fromPath(String path) {
-		WickerFile wickerFile;
-		wickerFile.file = new File(path);		
-		return wickerFile;
+	public WickerFile fromPath(String path) {		
+		file = new File(path);		
+		return this;
 	}
 	
 	public WickerFile withFilter(String filter) {

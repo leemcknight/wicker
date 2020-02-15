@@ -28,7 +28,7 @@ public class CsvReader extends WickerFileReader {
     
 
     @Override
-    public void open(String fileName) {
+    public void open(String fileName) throws IOException {
         File file = new File(fileName);
         reader = new BufferedReader(new FileReader(file));
         if(headerLine) {
@@ -44,11 +44,30 @@ public class CsvReader extends WickerFileReader {
     private WickerRecord buildRecord(String line) {
         WickerRecord record = new WickerRecord();
         StringBuilder fieldBuilder = new StringBuilder();
-        line.chars().forEach(ch -> {
-            
-            fieldBuilder.append(ch);
-            
-        }); 
+        boolean insideQuotes = false;
+        boolean escaped = false;
+        int columnIndex = 0;
+        
+        for(int i = 0; i <= line.length(); i++) {
+            char ch = line.charAt(i);
+            switch(ch) {
+                case ',':
+                    if(insideQuotes) {
+                        fieldBuilder.append(ch);
+                    } else {
+                        String columnName = "";
+                        if(columns == null || columns.isEmpty()) {
+                            columnName = "column_" + columnIndex++;
+                        } else {
+                            columnName = columns.get(columnIndex++);
+                        }
+                        record.add(columnName, fieldBuilder.toString());
+                        fieldBuilder = new StringBuilder();
+                    }
+                    break;
+            }
+        }
+
         return record;
     }
 }

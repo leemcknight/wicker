@@ -1,12 +1,13 @@
 package org.mcknight.wicker.commons.fs;
 
+import java.io.IOException;
 import java.util.stream.*;
 
 public abstract class WickerFileReader {
 
     private Schema schema;
 
-    public abstract WickerRecordSet open(String fileName);
+    public abstract void open(String fileName) throws IOException;
 
     public abstract Stream<WickerRecord> stream();
 

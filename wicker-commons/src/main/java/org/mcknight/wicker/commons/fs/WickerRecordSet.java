@@ -102,8 +102,7 @@ public class WickerRecordSet<T> implements Stream<T> {
     }
 
     @Override
-    public Stream<T> filter(Predicate<? super T> predicate) {
-        // TODO Auto-generated method stub
+    public WickerRecordSet<T> filter(Predicate<? super T> predicate) {
         return null;
     }
 
