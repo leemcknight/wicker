@@ -2,12 +2,26 @@ package org.mcknight.wicker.commons.fs;
 
 import org.mcknight.wicker.commons.lang.Expression;
 
+import java.net.URI;
 import java.util.function.Function;
 
 public class WickerRecordSet {
     private Schema schema;
     private Expression expression;
     private WickerFile file;
+    private WickerFileReader reader;
+
+    public WickerRecordSet() {
+        reader = 
+    }
+
+    public void load(URI uri) {
+
+    }
+
+    public void load(String path) {
+
+    }
 
     public WickerRecord next() {
         return null;

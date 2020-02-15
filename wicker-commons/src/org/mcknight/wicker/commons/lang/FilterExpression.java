@@ -12,7 +12,7 @@ public class FilterExpression extends Expression {
 
     @Override
     public WickerRecord evaluate(WickerRecord record) {
-
+        
     }
 
 }

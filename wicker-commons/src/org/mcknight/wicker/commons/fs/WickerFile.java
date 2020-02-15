@@ -14,7 +14,7 @@ public abstract class WickerFile {
 
 	
 	public static WickerFile fromPath(String path) {
-		WickerFile wickerFile = new WickerFile();
+		WickerFile wickerFile;
 		wickerFile.file = new File(path);		
 		return wickerFile;
 	}

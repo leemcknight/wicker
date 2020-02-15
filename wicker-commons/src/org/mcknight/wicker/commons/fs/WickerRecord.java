@@ -3,21 +3,14 @@ package org.mcknight.wicker.commons.fs;
 import java.util.Map;
 
 public class WickerRecord {
-	private Map<String, String> map;
+	private Map<String, Object> map;
 	
 	public WickerRecord() {
 		
 	}
-	public WickerRecord withSchema(Schema schema) {
-		return this;
-	}
-	
-	public WickerRecord withData(String data) {
-		return this;
-	}
-	
+		
 	public String getString(String fieldName) {
-		return map.get(fieldName);
+		return map.get(fieldName).toString();
 	}
 	
 	public long getLong(String fieldName) {
