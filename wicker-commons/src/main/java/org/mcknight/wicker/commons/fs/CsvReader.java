@@ -2,10 +2,9 @@ package org.mcknight.wicker.commons.fs;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.FileReader;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -32,7 +31,8 @@ public class CsvReader extends WickerFileReader {
         File file = new File(fileName);
         reader = new BufferedReader(new FileReader(file));
         if(headerLine) {
-            
+            String header = reader.readLine();
+            columns = buildHeaderLineColumns(header);
         }
     }
 
@@ -48,7 +48,7 @@ public class CsvReader extends WickerFileReader {
         boolean escaped = false;
         int columnIndex = 0;
         
-        for(int i = 0; i <= line.length(); i++) {
+        for(int i = 0; i < line.length(); i++) {
             char ch = line.charAt(i);
             switch(ch) {
                 case ',':
@@ -65,9 +65,22 @@ public class CsvReader extends WickerFileReader {
                         fieldBuilder = new StringBuilder();
                     }
                     break;
+                default:
+                    fieldBuilder.append(ch);
+                    break;
             }
         }
 
         return record;
+    }
+
+    private List<String> buildHeaderLineColumns(String header) {
+        String[] parts = header.split(",");
+        List<String> cols = new ArrayList<>();
+        for(String part : parts) {
+            cols.add(part);
+        }
+
+        return cols;
     }
 }

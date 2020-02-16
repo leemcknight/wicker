@@ -31,5 +31,6 @@ bin/
 target/
 .metadata/
 .recommenders/
+.vscode/settings.json
 *.vscode
 **/.vscode/

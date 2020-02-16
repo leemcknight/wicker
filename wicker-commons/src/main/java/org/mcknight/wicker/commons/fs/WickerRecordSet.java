@@ -1,7 +1,8 @@
 package org.mcknight.wicker.commons.fs;
 
 import org.mcknight.wicker.commons.lang.Expression;
-import java.net.URI;
+
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Optional;
@@ -22,100 +23,103 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
-public class WickerRecordSet<T> implements Stream<T> {
-    private Schema schema;
-    private Expression expression;
-    private WickerFile file;
-    private WickerFileReader reader;
+public class WickerRecordSet<T> implements Stream<T> {    
+    private WickerFileReader reader;  
+    private Class<T> clazz;  
 
-    public WickerRecordSet() {
-
+    public WickerRecordSet(Class<T> clazz) {
+        this.clazz = clazz;
     }
 
-    public void load(URI uri) {
-
+    public void loadCsv(String path) throws IOException {
+        reader = new CsvReader(true);
+        reader.open(path);        
     }
 
-    public void load(String path) {
-
+    private T transformFunc(WickerRecord record) {
+        T obj = null;
+        try {                                       
+            Constructor<T> ctor = clazz.getConstructor();
+            obj = (T)ctor.newInstance();
+            for(String fieldName : record.fields()) {
+                String setter = buildSetterName(fieldName);
+                Method method = clazz.getMethod(setter, String.class);
+                method.invoke(obj, record.getString(fieldName));
+            }
+        } catch(Exception ex) {
+            throw new WickerRecordException("Unable to build type from WickerRecord.", ex);
+        } 
+        return obj;        
     }
 
-    public WickerRecord next() {
-        return null;
+    private String buildSetterName(String fieldName) {
+        StringBuilder sb = new StringBuilder();
+        return sb.append("set")
+            .append(fieldName.substring(0,1).toUpperCase())
+            .append(fieldName.substring(1)).toString();
     }
 
-    public WickerRecord current() {
-        return null;
-    }
-
-    public long count() {
-        return 0;
+    private Stream<T> baseStream() {
+        return reader.stream().map(record -> transformFunc(record));
     }
 
     @Override
     public Iterator<T> iterator() {
-        // TODO Auto-generated method stub
-        return null;
+        return baseStream().iterator();
     }
 
     @Override
     public Spliterator<T> spliterator() {
-        // TODO Auto-generated method stub
-        return null;
+        return baseStream().spliterator();
     }
 
     @Override
     public boolean isParallel() {
-        // TODO Auto-generated method stub
-        return false;
+        return baseStream().isParallel();
     }
 
     @Override
-    public WickerRecordSet<T> sequential() {
+    public Stream<T> sequential() {
+        return baseStream().sequential();
+    }
+
+    @Override
+    public Stream<T> parallel() {
+        return baseStream().parallel();
+    }
+
+    @Override
+    public Stream<T> unordered() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public WickerRecordSet<T> parallel() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public WickerRecordSet<T> unordered() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public WickerRecordSet<T> onClose(Runnable closeHandler) {
-        // TODO Auto-generated method stub
-        return null;
+    public Stream<T> onClose(Runnable closeHandler) {
+        return baseStream().onClose(closeHandler);
     }
 
     @Override
     public void close() {
-        // TODO Auto-generated method stub
-
+        baseStream().close();
     }
 
     @Override
-    public WickerRecordSet<T> filter(Predicate<? super T> predicate) {
-        return null;
+    public Stream<T> filter(Predicate<? super T> predicate) {
+        return reader.stream().map(record -> transformFunc(record)).filter(predicate);        
     }
 
     @Override
-    public <R> WickerRecordSet<R> map(Function<? super T, ? extends R> mapper) {
-        
-        return null;
+    public <R> Stream<R> map(Function<? super T, ? extends R> mapper) {
+        return baseStream().map(mapper);
     }
 
     @Override
     public IntStream mapToInt(ToIntFunction<? super T> mapper) {
-        // TODO Auto-generated method stub
-        return null;
+        return baseStream().mapToInt(mapper);        
     }
 
     @Override
@@ -131,7 +135,7 @@ public class WickerRecordSet<T> implements Stream<T> {
     }
 
     @Override
-    public <R> WickerRecordSet<R> flatMap(Function<? super T, ? extends Stream<? extends R>> mapper) {
+    public <R> Stream<R> flatMap(Function<? super T, ? extends Stream<? extends R>> mapper) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -155,39 +159,33 @@ public class WickerRecordSet<T> implements Stream<T> {
     }
 
     @Override
-    public WickerRecordSet<T> distinct() {
-        // TODO Auto-generated method stub
-        return null;
+    public Stream<T> distinct() {
+        return baseStream().distinct();        
     }
 
     @Override
-    public WickerRecordSet<T> sorted() {
-        // TODO Auto-generated method stub
-        return null;
+    public Stream<T> sorted() {
+        return baseStream().sorted();
     }
 
     @Override
-    public WickerRecordSet<T> sorted(Comparator<? super T> comparator) {
-        // TODO Auto-generated method stub
-        return null;
+    public Stream<T> sorted(Comparator<? super T> comparator) {
+        return baseStream().sorted(comparator);
     }
 
     @Override
-    public WickerRecordSet<T> peek(Consumer<? super T> action) {
-        // TODO Auto-generated method stub
-        return null;
+    public Stream<T> peek(Consumer<? super T> action) {
+        return baseStream().peek(action);
     }
 
     @Override
     public Stream<T> limit(long maxSize) {
-        // TODO Auto-generated method stub
-        return null;
+        return baseStream().limit(maxSize);
     }
 
     @Override
     public Stream<T> skip(long n) {
-        // TODO Auto-generated method stub
-        return null;
+        return baseStream().skip(n);
     }
 
     @Override
@@ -216,26 +214,22 @@ public class WickerRecordSet<T> implements Stream<T> {
 
     @Override
     public T reduce(T identity, BinaryOperator<T> accumulator) {
-        // TODO Auto-generated method stub
-        return null;
+        return baseStream().reduce(identity, accumulator);
     }
 
     @Override
     public Optional<T> reduce(BinaryOperator<T> accumulator) {
-        // TODO Auto-generated method stub
-        return null;
+        return baseStream().reduce(accumulator);
     }
 
     @Override
     public <U> U reduce(U identity, BiFunction<U, ? super T, U> accumulator, BinaryOperator<U> combiner) {
-        // TODO Auto-generated method stub
-        return null;
+        return baseStream().reduce(identity, accumulator, combiner);
     }
 
     @Override
     public <R> R collect(Supplier<R> supplier, BiConsumer<R, ? super T> accumulator, BiConsumer<R, R> combiner) {
-        // TODO Auto-generated method stub
-        return null;
+        return baseStream().collect(supplier, accumulator, combiner);
     }
 
     @Override
@@ -254,6 +248,12 @@ public class WickerRecordSet<T> implements Stream<T> {
     public Optional<T> max(Comparator<? super T> comparator) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public long count() {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
     @Override
@@ -285,4 +285,6 @@ public class WickerRecordSet<T> implements Stream<T> {
         // TODO Auto-generated method stub
         return null;
     }
+
+    
 }

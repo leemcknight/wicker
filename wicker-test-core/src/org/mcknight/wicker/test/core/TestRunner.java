@@ -4,13 +4,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.mcknight.wicker.logger.Log;
-import org.mcknight.wicker.logger.LogBuilder;
+//import org.mcknight.wicker.logger.Log;
+//import org.mcknight.wicker.logger.LogBuilder;
 
 public class TestRunner {
-	private Log log;
+	//private Log log;
 	public TestRunner() {
-		log = new LogBuilder().toStandardError().toStandardOut().build();
+		//log = new LogBuilder().toStandardError().toStandardOut().build();
 	}
 	public void hasTests(Class<?> clazz) {
 		Object testClassInstance = null;
@@ -23,13 +23,13 @@ public class TestRunner {
 						testClassInstance = constructor.newInstance();
 						method.invoke(testClassInstance);
 					} catch(InvocationTargetException e) {
-						log.error(e.getMessage());
+						//log.error(e.getMessage());
 					} catch(NoSuchMethodException e) {
-						log.error(e.getMessage());
+						//log.error(e.getMessage());
 					} catch(IllegalAccessException e) {
-						log.error(e.getMessage());
+						//log.error(e.getMessage());
 					} catch(InstantiationException e) {
-						log.error(e.getMessage());
+						//log.error(e.getMessage());
 					}
 				}
 				runTest(method, testClassInstance);

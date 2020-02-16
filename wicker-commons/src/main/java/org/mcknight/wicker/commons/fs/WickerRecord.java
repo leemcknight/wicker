@@ -1,16 +1,24 @@
 package org.mcknight.wicker.commons.fs;
 
 import java.util.Map;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class WickerRecord {
 	private Map<String, Object> map;
 	
 	public WickerRecord() {
-		
+		map = new HashMap<String, Object>();
+	}
+
+	public List<String> fields() {
+		return Collections.unmodifiableList(map.keySet().stream().collect(Collectors.toList()));
 	}
 
 	public void add(String fieldName, Object data) {
-
+		map.put(fieldName, data);
 	}
 		
 	public String getString(String fieldName) {
